@@ -1,12 +1,178 @@
-<link rel="manifest" href="manifest.json">
-
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planning Sportif</title>
 
-<meta name="theme-color" content="#0f0f0f">
+<style>
+body{
+    margin:0;
+    font-family: Arial;
+    background:#0f0f0f;
+    color:white;
+}
+
+.header{
+    text-align:center;
+    padding:20px;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    padding:15px;
+}
+
+.card{
+    background:#1c1c1c;
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
+    cursor:pointer;
+}
+
+.screen{
+    display:none;
+    padding:15px;
+}
+
+.back{
+    color:#00aaff;
+    cursor:pointer;
+    margin-bottom:10px;
+}
+
+.exercise{
+    background:#1c1c1c;
+    padding:15px;
+    margin:10px 0;
+    border-radius:12px;
+    cursor:pointer;
+}
+
+.total{
+    margin-top:15px;
+    color:#00ff99;
+    font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">🏋️ Planning Sportif</div>
+
+<div id="home" class="grid"></div>
+
+<div id="screen" class="screen">
+    <div class="back" onclick="goHome()">⬅ Retour</div>
+    <h2 id="title"></h2>
+    <div id="list"></div>
+    <div class="total" id="total"></div>
+</div>
 
 <script>
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
+const data = {
+"Lundi":[
+{name:"Haut 45",time:15,url:"https://www.youtube.com/watch?v=wEeFJC0VdiU"},
+{name:"Haut 30/30",time:12,url:"https://www.youtube.com/watch?v=i5VA9_lnHy0"},
+{name:"Pect XXL",time:8,url:"https://www.youtube.com/watch?v=A61dLcsS9Ck"},
+{name:"ABS Halt",time:5,url:"https://www.youtube.com/watch?v=FLt6CEXRzvU"}
+],
+"Mardi":[
+{name:"Haut 30/30",time:15,url:"https://www.youtube.com/watch?v=i5VA9_lnHy0"},
+{name:"Haut 45",time:15,url:"https://www.youtube.com/watch?v=wEeFJC0VdiU"},
+{name:"Épaule",time:10,url:"https://www.youtube.com/watch?v=FzbaTDR9rl4"},
+{name:"Pect Halt",time:10,url:"https://www.youtube.com/watch?v=tusmBTsRkvA"},
+{name:"ABS",time:10,url:"https://www.youtube.com/watch?v=hl-B-sWNjK4"}
+],
+"Mercredi":[
+{name:"Pect Halt",time:8,url:"https://www.youtube.com/watch?v=o-W8CYduTSU"},
+{name:"Haut 30/30",time:12,url:"https://www.youtube.com/watch?v=2un8txHUxvc"},
+{name:"Épaule",time:10,url:"https://www.youtube.com/watch?v=aTfteNiGqqg"},
+{name:"ABS Halt",time:8,url:"https://www.youtube.com/watch?v=tFBWLq1VykM"}
+],
+"Jeudi":[
+{name:"Haut 30/30",time:15,url:"https://www.youtube.com/watch?v=i5VA9_lnHy0"},
+{name:"Haut 45",time:15,url:"https://www.youtube.com/watch?v=wEeFJC0VdiU"},
+{name:"ABS Halt",time:8,url:"https://www.youtube.com/watch?v=tFBWLq1VykM"}
+],
+"Vendredi":[
+{name:"Cross Fit",time:12,url:"https://www.youtube.com/watch?v=D3MxoqOh1QM"},
+{name:"Cross Fit",time:8,url:"https://www.youtube.com/watch?v=k7pBeVSefBw"},
+{name:"Haut 30/30",time:15,url:"https://www.youtube.com/watch?v=i5VA9_lnHy0"},
+{name:"Haut 45",time:15,url:"https://www.youtube.com/watch?v=wEeFJC0VdiU"},
+{name:"ABS Halt",time:8,url:"https://www.youtube.com/watch?v=tFBWLq1VykM"}
+],
+"Samedi":[
+{name:"Haut 45",time:15,url:"https://www.youtube.com/watch?v=7BkgQefxdrA"},
+{name:"Pect Halt",time:10,url:"https://www.youtube.com/watch?v=tusmBTsRkvA"},
+{name:"Pect Halt",time:8,url:"https://www.youtube.com/watch?v=o-W8CYduTSU"},
+{name:"ABS Halt",time:5,url:"https://www.youtube.com/watch?v=FLt6CEXRzvU"}
+],
+"Dimanche":[
+{name:"Haut 45",time:15,url:"https://www.youtube.com/watch?v=7BkgQefxdrA"},
+{name:"Haut 30/30",time:12,url:"https://www.youtube.com/watch?v=2un8txHUxvc"},
+{name:"Pect Pompe 100",time:6,url:"https://www.youtube.com/watch?v=tSFrzHPGZwM"},
+{name:"ABS Halt",time:5,url:"https://www.youtube.com/watch?v=tFBWLq1VykM"}
+]
+};
+
+const home=document.getElementById("home");
+const screen=document.getElementById("screen");
+const list=document.getElementById("list");
+const title=document.getElementById("title");
+const total=document.getElementById("total");
+
+function init(){
+for(let day in data){
+let totalMin=data[day].reduce((a,b)=>a+b.time,0);
+
+let div=document.createElement("div");
+div.className="card";
+div.innerHTML=`<h3>${day}</h3><p>${totalMin} min</p>`;
+div.onclick=()=>openDay(day);
+home.appendChild(div);
 }
+}
+
+function openDay(day){
+home.style.display="none";
+screen.style.display="block";
+
+title.innerText=day;
+list.innerHTML="";
+
+let totalMin=0;
+
+data[day].forEach(ex=>{
+totalMin+=ex.time;
+
+let div=document.createElement("div");
+div.className="exercise";
+div.innerHTML=`${ex.name} — ${ex.time} min`;
+
+div.onclick=()=>{
+window.open(ex.url,"_blank");
+};
+
+list.appendChild(div);
+});
+
+total.innerText="Total : "+totalMin+" min";
+}
+
+function goHome(){
+screen.style.display="none";
+home.style.display="grid";
+}
+
+init();
 </script>
-// navigator.serviceWorker.register("service-worker.js");
+
+</body>
+</html>
